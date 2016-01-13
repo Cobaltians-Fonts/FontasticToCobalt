@@ -27,7 +27,7 @@ python fontasticToCobalt.py icons-reference.html yourFontName.ttf
 ```
 
 In Android Studio:
-0. Open your projet
-0. Select File/New/ImportModule/
-0. Then select the generated font module 'fontYourFontName'
-0. Clic Finish... Voila!
+* Open your projet
+* Select File/New/ImportModule/
+* Then select the generated font module 'fontYourFontName'
+* Clic Finish... Voila!
