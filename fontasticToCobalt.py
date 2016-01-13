@@ -18,7 +18,7 @@ fontname = 'fontastic'           # Change this before launching the script
 fontname = fontname.title()
 fontpath = 'font' + fontname + '/'
 assetspath = 'font' + fontname + '/src/main/assets/'
-javapath = 'font' + fontname + '/src/main/java/fr/cobaltians/fonts/font' + fontname + '/'
+javapath = 'font' + fontname + '/src/main/java/org/cobaltians/fonts/font' + fontname + '/'
 drawablepath = 'font' + fontname + '/src/main/res/drawable/'
 valuepath = 'font' + fontname + '/src/main/res/values/'
 
