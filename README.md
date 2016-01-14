@@ -1,7 +1,7 @@
 Fontastic To Cobalt
 ===================
 
-This python script will help you to include any [Fontactic](http://fontastic.me/)) fonts on your Android App. See the [How to use](#usage) below.
+This python script will help you to include any [Fontastic](http://fontastic.me/) fonts on your Android App. See the [How to use](#usage) below.
 
 * This script create a standard Android module architecture.
 * Parse the .html given by Fontastic, extract icons name and associated glyphs and put them into strings.xml.

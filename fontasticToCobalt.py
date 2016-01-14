@@ -15,10 +15,13 @@ if (len(sys.argv) != 3):
 
 # configuration
 fontname = 'fontastic'           # Change this before launching the script
+packagename = 'org.cobaltians'
+
 fontname = fontname.title()
+packagepath = '/' + packagename.replace(".", "/") + '/'
 fontpath = 'font' + fontname + '/'
 assetspath = 'font' + fontname + '/src/main/assets/'
-javapath = 'font' + fontname + '/src/main/java/org/cobaltians/fonts/font' + fontname + '/'
+javapath = 'font' + fontname + '/src/main/java' + packagepath + 'fonts/font' + fontname + '/'
 drawablepath = 'font' + fontname + '/src/main/res/drawable/'
 valuepath = 'font' + fontname + '/src/main/res/values/'
 
@@ -58,6 +61,8 @@ class MyHTMLParser(HTMLParser):
             if tag == 'input':
                 if name == 'value':
                     if ulmapping == True:
+                        if value[0].isdigit(): # strings.xml does not accept icon name starting with a number
+                            value = 'f' + value
                         names.append(value.replace("-", "_"))
                     elif ulmapping == False:
                         glyphs.append(value.replace("-", "_"))
@@ -73,7 +78,7 @@ print 'done.'
 # Create xml file
 print 'Setting strings.xml file infos...',
 doc = Document()
-base = doc.createElement('ressource')
+base = doc.createElement('resources')
 doc.appendChild(base)
 
 for i, j in zip(names, glyphs):
@@ -100,7 +105,7 @@ print 'done.'
 # Create Manifest.xml
 print 'Creating Manifest.xml...',
 manifest = open(fontpath + 'src/main/AndroidManifest.xml', "w")
-manifest.write('<manifest\n    package="fr.cobaltians.fonts.font' + fontname + '">\n</manifest>\n')
+manifest.write('<manifest\n    package="' + packagename + '.fonts.font' + fontname + '">\n</manifest>\n')
 manifest.close()
 print 'done.'
 
@@ -141,7 +146,7 @@ shutil.copy(sys.argv[2], path)
 print 'done.'
 
 # Create FontDrawable.java
-templatefontdrawable = Template("""package fr.cobaltians.fonts.font${fontkey};
+templatefontdrawable = Template("""package ${packagekey}.fonts.font${fontkey};
 
 import android.content.Context;
 import android.graphics.Color;
@@ -193,7 +198,7 @@ public class Font${fontkey}Drawable extends CobaltAbstractFontDrawable {
 path = javapath + 'Font' + fontname + 'Drawable.java'
 print 'Generating ' + path + '...',
 fontdrawable = open(path,'w')
-fontdrawable.write(templatefontdrawable.substitute(fontkey=fontname))
+fontdrawable.write(templatefontdrawable.substitute(fontkey=fontname, packagekey=packagename))
 fontdrawable.close()
 print 'done.'
 
