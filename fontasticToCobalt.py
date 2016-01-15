@@ -8,32 +8,69 @@ from string import Template
 import os, errno
 import shutil
 import sys
+import imp
 
-if (len(sys.argv) != 3):
-    print 'Usage: python', sys.argv[0], 'icons-references.html Fontxxx.ttf'
-    exit(1)
+class bcolors:
+        OKBLUE = '\033[94m'
+        OKGREEN = '\033[92m'
+        WARNING = '\033[93m'
+        FAIL = '\033[91m'
+        BOLD = '\033[1m'
+        ENDC = '\033[0m'
 
 # configuration
-fontname = 'fontastic'           # Change this before launching the script
-packagename = 'org.cobaltians'
-
+fontname = 'awesome'           # Change this before launching the script
 fontname = fontname.title()
-packagepath = '/' + packagename.replace(".", "/") + '/'
-fontpath = 'font' + fontname + '/'
-assetspath = 'font' + fontname + '/src/main/assets/'
-javapath = 'font' + fontname + '/src/main/java' + packagepath + 'fonts/font' + fontname + '/'
-drawablepath = 'font' + fontname + '/src/main/res/drawable/'
-valuepath = 'font' + fontname + '/src/main/res/values/'
+packagename = 'org.cobaltians'
+debug = True
+
+# todo: package to create with optional parameter
+android = True
+ios = True
+
+try:
+    androidtpl = imp.load_source('templates_android', 'templates/tpl.android.py')
+    iostpl = imp.load_source('templates_ios', 'templates/tpl.ios.py')
+except:
+    print bcolors.FAIL + "I'm missing my templates. Exiting..." + bcolors.ENDC
+    raise
+
+try:
+    fontastic_parser = imp.load_source('parsers_fontastic', 'parsers/fontastic.py')
+    icomoon_parser = imp.load_source('parsers_icomoon', 'parsers/icomoon.py')
+except:
+    print bcolors.FAIL + "I'm missing my parsers. Exiting..." + bcolors.ENDC
+    raise
+
+
+if (len(sys.argv) != 4):
+    print bcolors.FAIL + 'Usage: python', sys.argv[0], ' icons-references.html Fontxxx.ttf fontastic|icomoon' + bcolors.ENDC
+    exit(2)
+
+# todo: getopts -s=htmlsource | --sources=htmlsource
+fontastic = False
+icomoon = False
+if sys.argv[3] == 'fontastic':
+        fontastic = True
+elif sys.argv[3] == 'icomoon':
+        icomoon = True
+else:
+        print bcolors.FAIL + "Unknown html-type " + sys.argv[3] + ". Try 'fontastic' or 'icomoon'. Exiting..." + bcolors.ENDC
+        exit(3)
 
 # storage
 names = []
 glyphs = []
 
-print 'Starting to create ' + fontname + ' package.' 
+# Usage :
+# str   : what to log
+def logme(str):
+    if debug == True : print str
 
-# creating package architecture
+# Usage:
+# path : file path
 def mkdir_p(path):
-    print 'Creating path:', path
+    logme('Creating path: ' + path)
     try:
         os.makedirs(path)
     except OSError as exc: # Python >2.5
@@ -41,167 +78,145 @@ def mkdir_p(path):
             pass
         else: raise
 
-print 'Creating package architecture...'
+# Usage:
+# name : the file name (ex: LICENCE)
+# path : the path name without file name (ex: /src/main/)
+# content : the content to add in the file (ex: "Copyright (c) 2015 Cobaltians...")
+def generatefile(name, path, content):
+    logme(bcolors.OKBLUE + 'Generating ' + path + name + '...' + bcolors.ENDC)
+    file = open(path + name, "w")
+    file.write(content)
+    file.close
+
+def copyfile(src, dst):
+    logme(bcolors.OKBLUE + 'Copying ' + src + ' to ' + dst + '...' + bcolors.ENDC)
+    shutil.copy(src, dst)
+
+# Starting to parse HTML
+logme('Opening ' + sys.argv[1] + ' and parsing HTML...')
+file = open(sys.argv[1], 'r')
+
+# IcoMoon parsing
+if icomoon == True:
+        icomoon_parser.parseHTML(file)
+        names = icomoon_parser.get_names()
+        glyphs = icomoon_parser.get_glyphs()
+
+# fontastic parsing
+elif fontastic == True:
+        fontastic_parser.parseHTML(file)
+        names = fontastic_parser.get_names()
+        glyphs = fontastic_parser.get_glyphs()
+
+print 'parser get', names
+print 'parser get', glyphs
+        
+# End parsing
+file.close()
+
+# Android package architecture
+packagepath = packagename.replace(".", "/") + '/'
+fontpath = 'sandbox/Fonts-Font' + fontname + '-Android/'
+assetspath = fontpath + 'src/main/assets/'
+javapath = fontpath + 'src/main/java/' + packagepath + 'fonts/font' + fontname + '/'
+drawablepath = fontpath + 'src/main/res/drawable/'
+valuepath = fontpath + 'src/main/res/values/'
+
+# IOS package architecture
+iospackagepath = 'sandbox/Fonts-Font' + fontname + '-iOS/'
+
+# Android pakage
+logme(bcolors.BOLD + 'Starting to create Android ' + fontname + ' package.' + bcolors.ENDC)
+
+# creating package architecture
 mkdir_p(assetspath)
 mkdir_p(javapath)
 mkdir_p(drawablepath)
 mkdir_p(valuepath)
-print 'All done.'
-
-# create a subclass of HTMLParser and override the handler methods
-class MyHTMLParser(HTMLParser):
-    def handle_starttag(self, tag, attrs):
-        global ulmapping
-        for name, value in attrs:
-            if tag == 'ul':
-                if value == 'glyphs css-mapping':
-                    ulmapping = True;
-                elif value == 'glyphs character-mapping':
-                    ulmapping = False;
-            if tag == 'input':
-                if name == 'value':
-                    if ulmapping == True:
-                        if value[0].isdigit(): # strings.xml does not accept icon name starting with a number
-                            value = 'f' + value
-                        names.append(value.replace("-", "_"))
-                    elif ulmapping == False:
-                        glyphs.append(value.replace("-", "_"))
-
-# instantiate the parser and fed it some HTML
-print 'Opening', sys.argv[1], 'and parsing HTML...',
-file = open(sys.argv[1], 'r')
-parser = MyHTMLParser()
-parser.feed(file.read())
-file.close()
-print 'done.'
 
 # Create xml file
-print 'Setting strings.xml file infos...',
+logme('Setting strings.xml file infos...')
 doc = Document()
 base = doc.createElement('resources')
 doc.appendChild(base)
 
-for i, j in zip(names, glyphs):
+for name, glyph in zip(names, glyphs):
     entry = doc.createElement('string')
     base.appendChild(entry)
-    entry.setAttribute("name"  , i)
+    entry.setAttribute("name", name)
     entry.setAttribute("translatable"  , "false")
-    entry_content = doc.createTextNode(j)
+    entry_content = doc.createTextNode(glyph)
     entry.appendChild(entry_content)
 
-# store strings.xml
-strings = open(valuepath + 'strings.xml', "w")
-strings.write(doc.toprettyxml(indent="    ", encoding="utf-8"))
-strings.close()
-print 'done.'
+xmltxt = doc.toprettyxml(indent="    ", encoding="utf-8")
+xmltxt = xmltxt.replace('&amp;', '&') # utf-8 fix
+generatefile('strings.xml', valuepath, xmltxt)
 
 # Create values.xml
-print 'Creating values.xml...',
-values = open(valuepath + 'values.xml', "w")
-values.write('<?xml version="1.0" encoding="utf-8"?>\n<resources>\n    <dimen name="padding">2dp</dimen>\n    <dimen name="textSize">20sp</dimen>\n</resources>\n')
-values.close()
-print 'done.'
-
-# Create Manifest.xml
-print 'Creating Manifest.xml...',
-manifest = open(fontpath + 'src/main/AndroidManifest.xml', "w")
-manifest.write('<manifest\n    package="' + packagename + '.fonts.font' + fontname + '">\n</manifest>\n')
-manifest.close()
-print 'done.'
+generatefile('values.xml', valuepath, androidtpl.values)
 
 # Create build.gradle
-print 'Creating build.gradle...',
-gradle = open(fontpath + 'build.gradle', "w")
-gradle.write("""apply plugin: 'com.android.library'
+generatefile('build.gradle', fontpath, androidtpl.gradle)
 
-android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+# Create LICENCE file
+generatefile('LICENCE', fontpath, androidtpl.licence)
 
-    defaultConfig {
-        minSdkVersion 8
-        targetSdkVersion 23
-        versionCode 1
-        versionName "1.0"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
-            sourceSets { main { assets.srcDirs = ['src/main/assets', 'src/main/assets/'] } }
-}
+# Create Manifest.xml
+generatefile('AndroidManifest.xml', fontpath + 'src/main/', androidtpl.manifest.substitute(packagenamekey = packagename, fontkey = fontname))
 
-dependencies {
-    compile project(':cobalt')
-}\n""")
-gradle.close()
-print 'done.'
+# Create FontDrawable.java
+generatefile('Font' + fontname + 'Drawable.java', javapath, androidtpl.javadrawable.substitute(fontkey=fontname, packagekey=packagename))
 
 # Copy font.ttf
 path = assetspath + 'Font' + fontname + '.ttf'
-print 'Copying', sys.argv[2], 'to', path, '...',
-shutil.copy(sys.argv[2], path)
-print 'done.'
+copyfile(sys.argv[2], path)
 
-# Create FontDrawable.java
-templatefontdrawable = Template("""package ${packagekey}.fonts.font${fontkey};
+####### IOS packaging
 
-import android.content.Context;
-import android.graphics.Color;
-import android.util.Log;
+if ios == True : logme(bcolors.BOLD + 'Starting to create IOS ' + fontname + ' package.' + bcolors.ENDC)
 
-import fr.cobaltians.cobalt.Cobalt;
-import fr.cobaltians.cobalt.font.CobaltAbstractFontDrawable;
+prefix = 'f' + fontname[0]
+upperprefix = prefix.upper()    # ex: home -> @FAhome
+lowerprefix = prefix.lower()    # ex: fontAwesome -> fa
 
-/**
- * Created by sebastienfamel on 16/10/2015.
- */
-public class Font${fontkey}Drawable extends CobaltAbstractFontDrawable {
-    private static final String TAG = Font${fontkey}Drawable.class.getSimpleName();
+# identifier list generation: glass -> fa-glass
+identifiers = []
 
-    private static final String FONT_FILE = "Font${fontkey}.ttf";
-    public static final int TEXT_COLOR_LIGHT = Color.argb(153, 51, 51, 51);
-    public static final int TEXT_COLOR_DARK = Color.argb(204, 255, 255, 255);
+for name in names:
+    identifiers.append(lowerprefix + '-' +  name.replace("_", "-"))
 
-    public Font${fontkey}Drawable(Context context, String text, int color) {
-        super(context, text, color, context.getResources().getDimensionPixelSize(R.dimen.textSize), context.getResources().getDimensionPixelSize(R.dimen.padding));
-    }
+# dictionary token string generation: fa-glass,FAglass -> tmp[@"fa-glass"]= @(FAglass);\n
+tokenlist = ''
+nbglyph = len(glyphs)
+it = 1
 
-    @Override
-    protected String getStringResource(String identifier) {
-        if (identifier.contains("-")) {
-            identifier = identifier.replace("-", "_");
-        }
-        try {
-            String packageName = mContext.getPackageName();
-            int resourceId = mContext.getResources().getIdentifier(identifier, "string", packageName);
-            if (resourceId != 0) {
-                String iconId = mContext.getResources().getString(resourceId);
-                return iconId;
-            }
-            else if (Cobalt.DEBUG) Log.e(TAG, "- getStringResource : no found resource");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
+for identifier, glyph in zip(identifiers, glyphs):
+    tokenlist = tokenlist + '        @"' + identifier + '": ' + glyph + '"'
+    if it != nbglyph:
+        tokenlist = tokenlist + ',\n'
+    it = it + 1
+tokenlist = tokenlist.replace('&#x', '@"\u'); # converting to ios .m format todo: replace + delete ';'
+tokenlist = tokenlist.strip()
 
-    @Override
-    protected String getFontFilePath() {
-        return FONT_FILE;
-    }
-}
-""")
+# building IOS architecture
+mkdir_p(iospackagepath)
 
-path = javapath + 'Font' + fontname + 'Drawable.java'
-print 'Generating ' + path + '...',
-fontdrawable = open(path,'w')
-fontdrawable.write(templatefontdrawable.substitute(fontkey=fontname, packagekey=packagename))
-fontdrawable.close()
-print 'done.'
+# Creating FontFontastic.h
+generatefile('Font' + fontname + '.h', iospackagepath, iostpl.tplfonth.substitute(fontkey = fontname))
 
-print 'All jobs done.'
+# Creating FontFontastic.m
+generatefile('Font' + fontname + '.m', iospackagepath, iostpl.tplfontm.substitute(fontkey = fontname, tokenlistkey = tokenlist))
 
+# Creating LICENCE file
+generatefile('LICENCE', iospackagepath, iostpl.licence)
+
+# Copy font.ttf
+path = iospackagepath + 'Font' + fontname + '.ttf'
+copyfile(sys.argv[2], path)
+
+print 'Jobs done:'
+if android == True:
+    print bcolors.OKGREEN + ' * Android ' + fontname + ' font package added.' + bcolors.ENDC
+if ios == True:
+    print bcolors.OKGREEN + ' * IOS ' + fontname + ' font package added.' + bcolors.ENDC
 exit(0)

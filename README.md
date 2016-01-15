@@ -1,14 +1,14 @@
 Fontastic To Cobalt
 ===================
 
-This python script will help you to include any [Fontastic](http://fontastic.me/) fonts on your Android App. See the [How to use](#usage) below.
+This python script will help you to include any [Fontastic](http://fontastic.me/) or [Icomoon](https://icomoon.io/) fonts on your Android or IOS Cobalt App. See the [How to use](#usage) below.
 
-* This script create a standard Android module architecture.
-* Parse the .html given by Fontastic, extract icons name and associated glyphs and put them into strings.xml.
-* Create a basic AndroidManifest.xml and a build.gradle with [Cobalt](http://cobaltians.org/) dependency.
+* This script create a standard Android|IOS module architecture.
+* Parse the .html given by Fontastic|Icomoon, extract icons name and associated glyphs and put them in the created package.
+* Android: Create a basic AndroidManifest.xml, build.gradle with [Cobalt](http://cobaltians.org/) dependency, and the corresponding java code according to the Cobalt framework in the package.
+* IOS: Create a basic projet with a header and some generated .m code and fill them.
 * Copy the font.ttf in the package's assets directory.
-* Add the corresponding java code according to the Cobalt framework in the package.
-* The resulting module is generated in the ./fontname directory.
+* The resulting module is generated in the ./Fonts-FontName-Android|IOS directory.
 
 Please see our [contributing guidelines](CONTRIBUTING.md) before reporting an issue.
 
@@ -23,7 +23,7 @@ Usage
 -----
 
 ```
-python fontasticToCobalt.py icons-reference.html yourFontName.ttf
+python fontasticToCobalt.py icons-reference.html|Reference.html yourFontName.ttf fontastic|icomoon
 ```
 
 In Android Studio:
