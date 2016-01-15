@@ -1,3 +1,7 @@
+#
+# Created by Roxane P. on 15/01/2016
+#
+
 from HTMLParser import HTMLParser
 
 names = []

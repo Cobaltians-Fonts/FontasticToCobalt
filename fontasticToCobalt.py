@@ -24,7 +24,7 @@ fontname = fontname.title()
 packagename = 'org.cobaltians'
 debug = True
 
-# todo: package to create with optional parameter
+# todo: create only the wanted package (optional parameter)
 android = True
 ios = True
 
@@ -47,7 +47,7 @@ if (len(sys.argv) != 4):
     print bcolors.FAIL + 'Usage: python', sys.argv[0], ' icons-references.html Fontxxx.ttf fontastic|icomoon' + bcolors.ENDC
     exit(2)
 
-# todo: getopts -s=htmlsource | --sources=htmlsource
+# todo: use an optional parameter for source: -s=htmlsource or --sources=htmlsource (getopts)
 fontastic = False
 icomoon = False
 if sys.argv[3] == 'fontastic':
@@ -107,23 +107,20 @@ elif fontastic == True:
         fontastic_parser.parseHTML(file)
         names = fontastic_parser.get_names()
         glyphs = fontastic_parser.get_glyphs()
-
-print 'parser get', names
-print 'parser get', glyphs
-        
+       
 # End parsing
 file.close()
 
 # Android package architecture
 packagepath = packagename.replace(".", "/") + '/'
-fontpath = 'sandbox/Fonts-Font' + fontname + '-Android/'
+fontpath = 'Fonts-Font' + fontname + '-Android/'
 assetspath = fontpath + 'src/main/assets/'
 javapath = fontpath + 'src/main/java/' + packagepath + 'fonts/font' + fontname + '/'
 drawablepath = fontpath + 'src/main/res/drawable/'
 valuepath = fontpath + 'src/main/res/values/'
 
 # IOS package architecture
-iospackagepath = 'sandbox/Fonts-Font' + fontname + '-iOS/'
+iospackagepath = 'Fonts-Font' + fontname + '-iOS/'
 
 # Android pakage
 logme(bcolors.BOLD + 'Starting to create Android ' + fontname + ' package.' + bcolors.ENDC)

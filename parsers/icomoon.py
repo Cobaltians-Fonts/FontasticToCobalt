@@ -1,26 +1,30 @@
+#
+# Created by Roxane P. on 15/01/2016
+#
+
 from HTMLParser import HTMLParser
 import sys
 
 names = []
 glyphs = []
 
-# stay back ! this html parsing may hurt your eyes
+# stay back ! this HTML parsing may hurt your eyes
 class IcomoonParser (HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
         self.notthistag1 = False
         self.notthistag2 = True
         self.notthistag3 = True
-        self.it = False
+        self.notthistag4 = False
         self.i = 0
 
     def handle_starttag(self, tag, attrs):
         for attr, v in attrs:
             if attr == 'readonly':
-                self.it = True
+                self.notthistag4 = True
                 self.notthistag1 = True
             if attr == 'value':
-                if self.it == True and self.notthistag2 == True:
+                if self.notthistag4 == True and self.notthistag2 == True:
                     if self.notthistag3 == True:
                         self.i = self.i + 1
                         if self.i % 3 != 0 :
@@ -41,7 +45,7 @@ class IcomoonParser (HTMLParser):
                         self.notthistag3 = True
                     self.notthistag2 = False
                     self.notthistag1 = False
-                if self.it == True and self.notthistag1 == True:
+                if self.notthistag4 == True and self.notthistag1 == True:
                     self.notthistag1 = False
                     self.notthistag2 = True
                 it = False
