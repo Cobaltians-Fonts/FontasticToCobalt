@@ -23,7 +23,7 @@ Usage
 -----
 
 ```
-python fontasticToCobalt.py icons-reference.html|Reference.html yourFontName.ttf fontastic|icomoon
+python fontasticToCobalt.py --source fontastic|icomoon --name fontname --arch android|ios icons-reference.html|Reference.html yourfont.ttf
 ```
 
 In Android Studio:
