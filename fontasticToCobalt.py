@@ -19,8 +19,8 @@ class bcolors:
         BOLD = '\033[1m'
         ENDC = '\033[0m'
 
-# configuration
-fontname = 'awesome'           # Change this before launching the script
+# defaults values
+fontname = 'awesome'           
 fontname = fontname.title()
 packagename = 'org.cobaltians'
 version = '0.3'
@@ -62,7 +62,7 @@ def main():
 
         # Parse arguments
         try:
-                options, remainder = getopt.getopt(sys.argv[1:], 's:a:n:h:v', ['source=', 'arch=', 'name=', 'help'])
+                options, remainder = getopt.getopt(sys.argv[1:], 's:a:n:hv', ['source=', 'arch=', 'name=', 'help'])
         except getopt.GetoptError as err:
                 print str(err) # print help information and exit
                 sys.exit(2)
@@ -79,7 +79,7 @@ def main():
                                 print bcolors.FAIL + arg + ": this architecture is not supported yet. Try 'android' or 'ios'" + bcolors.ENDC
                                 exit(1)
                 elif opt in ('-h', '--help'):
-                        print bcolors.BOLD + 'Usage: python fontRefToCobalt -s fontastic|icomoon -a android icons-references.html Fontxxx.ttf' + bcolors.ENDC
+                        usage()
                         sys.exit(0)
                 elif opt in ('-n', '--name'):
                         logme('Set ' + arg + ' as font name.')
@@ -87,9 +87,13 @@ def main():
                 elif opt in ('-v'):
                         print 'Version', version
                         exit(0)
-
-        html_file_name = remainder[0]
-        ttf_file_name = remainder[1]
+        try:
+                html_file_name = remainder[0]
+                ttf_file_name = remainder[1]
+        except IndexError as exc:
+                print bcolors.FAIL + 'Bad arguments, see help:' + bcolors.ENDC
+                usage()
+                exit(1)
         
         # Opening HTML file
         logme('Opening ' + html_file_name + ' and parsing HTML...')
@@ -122,6 +126,10 @@ def main():
 #
 # Functions and class definitions
 #
+
+# print help
+def usage():
+        print bcolors.BOLD + 'Usage: python fontRefToCobalt -s fontastic|icomoon -a android icons-references.html Fontxxx.ttf' + bcolors.ENDC        
 
 # Usage :
 # str   : what to log
