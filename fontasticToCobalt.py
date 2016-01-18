@@ -20,8 +20,6 @@ class bcolors:
         ENDC = '\033[0m'
 
 # defaults values
-fontname = 'awesome'           
-fontname = fontname.title()
 packagename = 'org.cobaltians'
 version = '0.3'
 debug = True
@@ -49,6 +47,10 @@ def main():
         names = []
         glyphs = []
 
+        # optional parameter
+        fontname = 'awesome'
+        fontname = fontname.title()
+        
         # Use optional parameter to create only the wanted package (--arch ios|android)
         android = True
         ios = True
@@ -129,7 +131,7 @@ def main():
 
 # print help
 def usage():
-        print bcolors.BOLD + 'Usage: python fontRefToCobalt -s fontastic|icomoon -a android icons-references.html Fontxxx.ttf' + bcolors.ENDC        
+        print bcolors.BOLD + 'Usage: python fontRefToCobalt -s fontastic|icomoon [-a android] [-n fontname] icons-references.html Fontxxx.ttf' + bcolors.ENDC        
 
 # Usage :
 # str   : what to log
