@@ -1,5 +1,5 @@
-Fontastic To Cobalt
-===================
+Font To Cobalt
+==============
 
 This python script will help you to include any [Fontastic](http://fontastic.me/) or [Icomoon](https://icomoon.io/) fonts on your Android or IOS Cobalt App. See the [How to use](#usage) below.
 
@@ -10,13 +10,11 @@ This python script will help you to include any [Fontastic](http://fontastic.me/
 * Copy the font.ttf in the package's assets directory.
 * The resulting module is generated in the ./Fonts-FontName-Android|IOS directory.
 
-Please see our [contributing guidelines](CONTRIBUTING.md) before reporting an issue.
-
 Installation
 -----------
 
 ```
-git clone https://github.com/Cobaltians-Fonts/FontasticToCobalt.git
+git clone https://github.com/Cobaltians-Fonts/FontToCobalt.git
 ```
 
 Usage
@@ -29,5 +27,5 @@ python fontasticToCobalt.py --source fontastic|icomoon --name fontname --arch an
 In Android Studio:
 * Open your projet
 * Select File/New/ImportModule/
-* Then select the generated font module 'fontYourFontName'
+* Then select the generated font module 'Fonts-FontName-Android|IOS'
 * Clic Finish... Voila!
