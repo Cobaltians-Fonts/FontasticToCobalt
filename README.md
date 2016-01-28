@@ -30,15 +30,15 @@ In Android Studio:
 * Then select the generated font module 'Fonts-FontName-Android|IOS'
 * Clic Finish
 * Add this example code at the end of cobalt.conf
-'''
+```
 "fonts" : {
  "fa": {
    "ios": "FontsAwesome",
    "android": "org.cobaltians.fonts.fontAwesome.FontAwesomeDrawable"
  }
 }
-'''
+```
 * And Voila ! You can now use native bars icon using the name of the icon:
-'''
+```
 "icon": "fa house-icon"
-'''
+```

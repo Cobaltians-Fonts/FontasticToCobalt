@@ -108,7 +108,8 @@ def main():
         # IcoMoon or fontastic (there are more to come)
         if source == 'icomoon': parser = icomoon_parser
         elif source == 'fontastic': parser = fontastic_parser
-
+        else : parser = icomoon_parser
+        
         # Starting to parse HTML
         parser.parseHTML(file)
         names = parser.get_names()
