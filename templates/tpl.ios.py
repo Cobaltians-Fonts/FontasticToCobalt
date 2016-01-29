@@ -78,7 +78,7 @@ tplfontm = Template("""
         UILabel *label = [UILabel new];
         label.font = font;
         label.text = text;
-        fontSize = constraintLabelToSize(label, size, 500, 5);
+        fontSize = ${fontkey}constraintLabelToSize(label, size, 500, 5);
         font = label.font;
     }
     [color setFill];
@@ -98,7 +98,7 @@ tplfontm = Template("""
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int constraintLabelToSize(UILabel *label, CGSize size, int maxFontSize, int minFontSize) {
+int ${fontkey}constraintLabelToSize(UILabel *label, CGSize size, int maxFontSize, int minFontSize) {
     CGRect rect = CGRectMake(0, 0, size.width, size.height);
     label.frame = rect;
     
