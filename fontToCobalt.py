@@ -132,7 +132,7 @@ def main():
 
 # print help
 def usage():
-        print bcolors.BOLD + 'Usage: python fontRefToCobalt -s fontastic|icomoon [-a android] [-n fontname] icons-references.html Fontxxx.ttf' + bcolors.ENDC        
+        print bcolors.BOLD + 'Usage: python fontToCobalt -s fontastic|icomoon [-a android] [-n fontname] icons-references.html Fontxxx.ttf' + bcolors.ENDC        
 
 # Usage :
 # str   : what to log
