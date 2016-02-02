@@ -21,7 +21,7 @@ Usage
 -----
 
 ```
-python fontasticToCobalt.py --source fontastic|icomoon --name fontname --arch android|ios icons-reference.html|Reference.html yourfont.ttf
+python fontToCobalt.py --source fontastic|icomoon --name fontname --arch android|ios icons-reference.html|Reference.html yourfont.ttf
 ```
 
 In Android Studio:
