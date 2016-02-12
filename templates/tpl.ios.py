@@ -52,10 +52,7 @@ tplfontm = Template("""
 + (UIImage *)imageWithIcon:(NSString *)identifier
                      color:(UIColor *)color
                    andSize:(CGSize)size {
-    UIColor *backgroundColor = [UIColor clearColor];
-    
     CGFloat scale = [UIScreen mainScreen].scale;
-    
     if ([UIScreen instancesRespondToSelector:@selector(scale)]) {
         UIGraphicsBeginImageContextWithOptions(size, NO, scale);
     }
@@ -63,71 +60,35 @@ tplfontm = Template("""
         UIGraphicsBeginImageContext(size);
     }
     
-    NSString *text = [Font${fontkey} stringForIcon:identifier];
-    CGRect textRect = CGRectZero;
-    textRect.size = size;
+    NSString *icon = [Fontt${fontkey} stringForIcon:identifier];
+    NSRange iconRange = NSMakeRange(0, icon.length);
+    UIColor *backgroundColor = [UIColor clearColor];
+    CGRect textRect = CGRectMake(0, 0, size.width, size.height);
     
-    UIBezierPath *path = [UIBezierPath bezierPathWithRect:textRect];
-    [backgroundColor setFill];
-    [path fill];
+    UIFont *font = [UIFont fontWithName:@"Fontt${fontkey}"
+                                   size:size.height];
     
-    int fontSize = size.width;
-    UIFont *font = [UIFont fontWithName:@"Font${fontkey}"
-                                   size:fontSize];
-    @autoreleasepool {
-        UILabel *label = [UILabel new];
-        label.font = font;
-        label.text = text;
-        fontSize = ${fontkey}constraintLabelToSize(label, size, 500, 5);
-        font = label.font;
-    }
-    [color setFill];
-    [text drawInRect:textRect
-      withAttributes:@{NSFontAttributeName: font,
-                       NSForegroundColorAttributeName: color,
-                       NSBackgroundColorAttributeName: backgroundColor}];
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    paragraphStyle.alignment = NSTextAlignmentCenter;
     
-    UIImage * image = UIGraphicsGetImageFromCurrentImageContext();
+    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:icon];
+    [text addAttribute:NSFontAttributeName
+                 value:font
+                 range:iconRange];
+    [text addAttribute:NSForegroundColorAttributeName
+                 value:color
+                 range:iconRange];
+    [text addAttribute:NSBackgroundColorAttributeName
+                 value:backgroundColor
+                 range:iconRange];
+    [text addAttribute:NSParagraphStyleAttributeName
+                 value:paragraphStyle
+                 range:iconRange];
+    [text drawInRect:textRect];
+    
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return image;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#pragma mark HELPERS
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-int ${fontkey}constraintLabelToSize(UILabel *label, CGSize size, int maxFontSize, int minFontSize) {
-    CGRect rect = CGRectMake(0, 0, size.width, size.height);
-    label.frame = rect;
-    
-    // Try all font sizes from largest to smallest font size
-    int fontSize = maxFontSize;
-    
-    // Fit label width wize
-    CGSize constraintSize = CGSizeMake(label.frame.size.width, MAXFLOAT);
-    
-    do {
-        // Set current font size
-        label.font = [UIFont fontWithName:label.font.fontName
-                                     size:fontSize];
-        
-        // Find label size for current font size
-        CGRect textRect = [[label text] boundingRectWithSize:constraintSize
-                                                     options:NSStringDrawingUsesFontLeading
-                                                  attributes:@{NSFontAttributeName:label.font}
-                                                     context:nil];
-        // Done, if created label is within target size
-        if( textRect.size.height <= label.frame.size.height )
-            break;
-        
-        // Decrease the font size and try again
-        fontSize -= 2;
-        
-    } while (fontSize > minFontSize);
-    
-    return fontSize;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
