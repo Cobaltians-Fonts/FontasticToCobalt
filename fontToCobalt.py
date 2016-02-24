@@ -132,7 +132,7 @@ def main():
 
 # print help
 def usage():
-        print bcolors.BOLD + 'Usage: python fontToCobalt -s fontastic|icomoon [-a android] [-n fontname] icons-references.html Fontxxx.ttf' + bcolors.ENDC        
+        print bcolors.BOLD + 'Usage: python fontToCobalt -s fontastic|icomoon [-a android|ios] [-n fontname] icons-references.html Fontxxx.ttf' + bcolors.ENDC        
 
 # Usage :
 # str   : what to log
@@ -203,7 +203,7 @@ class ios_package_creator(object):
                 it = 1
 
                 for identifier, glyph in zip(identifiers, self.glyphs):
-                        tokenlist = tokenlist + '        @"' + identifier + '": @"' + glyph + '"'
+                        tokenlist = tokenlist + '        @"' + identifier + '": ' + glyph + '"'
                         if it != nbglyph:
                                 tokenlist = tokenlist + ',\n'
                         it = it + 1
@@ -256,12 +256,16 @@ class android_package_creator(object):
                 drawablepath = fontpath + 'src/main/res/drawable/'
                 valuepath = fontpath + 'src/main/res/values/'
 
-                # creating package architecture
+                # Creating package architecture
                 mkdir_p(assetspath)
                 mkdir_p(javapath)
                 mkdir_p(drawablepath)
                 mkdir_p(valuepath)
-                
+
+                # Set font name prefix
+                prefix = 'f' + self.fontname[0]
+                prefix = prefix.lower()
+
                 # Create xml file
                 logme('Setting strings.xml file infos...')
                 doc = Document()
@@ -271,9 +275,9 @@ class android_package_creator(object):
                 for name, glyph in zip(self.names, self.glyphs):
                         entry = doc.createElement('string')
                         base.appendChild(entry)
-                        entry.setAttribute("name", name)
+                        entry.setAttribute("name", prefix + '_' + name) # ex: glass -> fa_glass
                         entry.setAttribute("translatable"  , "false")
-                        entry_content = doc.createTextNode(glyph)
+                        entry_content = doc.createTextNode(glyph + ';') # ex: &#xf000 -> &#xf000;
                         entry.appendChild(entry_content)
                         
                 xmltxt = doc.toprettyxml(indent="    ", encoding="utf-8")

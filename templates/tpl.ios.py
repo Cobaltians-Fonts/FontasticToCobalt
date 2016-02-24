@@ -60,12 +60,12 @@ tplfontm = Template("""
         UIGraphicsBeginImageContext(size);
     }
     
-    NSString *icon = [Fontt${fontkey} stringForIcon:identifier];
+    NSString *icon = [Font${fontkey} stringForIcon:identifier];
     NSRange iconRange = NSMakeRange(0, icon.length);
     UIColor *backgroundColor = [UIColor clearColor];
     CGRect textRect = CGRectMake(0, 0, size.width, size.height);
     
-    UIFont *font = [UIFont fontWithName:@"Fontt${fontkey}"
+    UIFont *font = [UIFont fontWithName:@"Font${fontkey}"
                                    size:size.height];
     
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
