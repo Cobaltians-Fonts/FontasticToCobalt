@@ -62,8 +62,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
 
-import fr.cobaltians.cobalt.Cobalt;
-import fr.cobaltians.cobalt.font.CobaltAbstractFontDrawable;
+import org.cobaltians.cobalt.Cobalt;
+import org.cobaltians.cobalt.font.CobaltAbstractFontDrawable;
 
 /**
  * Created by sebastienfamel on 16/10/2015.

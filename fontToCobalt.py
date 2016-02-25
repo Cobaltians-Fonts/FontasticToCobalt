@@ -275,7 +275,7 @@ class android_package_creator(object):
                 for name, glyph in zip(self.names, self.glyphs):
                         entry = doc.createElement('string')
                         base.appendChild(entry)
-                        entry.setAttribute("name", prefix + '_' + name) # ex: glass -> fa_glass
+                        entry.setAttribute("name", prefix + '_' + name.replace("-", "_")) # ex: glass -> fa_glass
                         entry.setAttribute("translatable"  , "false")
                         entry_content = doc.createTextNode(glyph + ';') # ex: &#xf000 -> &#xf000;
                         entry.appendChild(entry_content)
