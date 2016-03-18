@@ -27,6 +27,7 @@ debug = True
 # Which parser to use (use optional parameter --sources=fontastic|icomoon)
 fontastic = False
 icomoon = False
+oldicomoon = False # fixme: used for famicity fonts refs
 
 try:
     androidtpl = imp.load_source('templates_android', 'templates/tpl.android.py')
@@ -38,6 +39,7 @@ except:
 try:
     fontastic_parser = imp.load_source('parsers_fontastic', 'parsers/fontastic.py')
     icomoon_parser = imp.load_source('parsers_icomoon', 'parsers/icomoon.py')
+    oldicomoon_parser = imp.load_source('parsers_oldicomoon', 'parsers/oldicomoon.py')
 except:
     print bcolors.FAIL + "I'm missing my parsers. Exiting..." + bcolors.ENDC
     raise
@@ -71,7 +73,7 @@ def main():
 
         for opt, arg in options:
                 if opt in ('-s', '--source'):
-                        if arg == 'fontastic' or arg == 'icomoon':
+                        if arg == 'fontastic' or arg == 'icomoon' or arg == 'oldicomoon':
                                 source = arg
                         else: print bcolors.FAIL + "I don't have any parser for " + arg + " yet. Try 'fontastic' or 'icomoon'" + bcolors.ENDC
                 elif opt in ('-a', '--arch'):
@@ -107,6 +109,7 @@ def main():
 
         # IcoMoon or fontastic (there are more to come)
         if source == 'icomoon': parser = icomoon_parser
+        elif source == 'oldicomoon': parser = oldicomoon_parser
         elif source == 'fontastic': parser = fontastic_parser
         else : parser = icomoon_parser
         
@@ -115,6 +118,10 @@ def main():
         names = parser.get_names()
         glyphs = parser.get_glyphs()
 
+        if debug == True :
+                print names
+                print glyphs
+        
         # End parsing
         file.close()
 
