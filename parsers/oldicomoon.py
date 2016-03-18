@@ -22,9 +22,7 @@ class IcomoonParser (HTMLParser):
                 self.j = self.j + 1
 
             if tag == 'i':
-                for attr in attrs:
-                    print attr[1]
-                    names.append(v)
+                names.append(v.lower())
 
 def parseHTML(file):
     parser = IcomoonParser()

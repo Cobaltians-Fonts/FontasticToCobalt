@@ -12,14 +12,27 @@ class IcomoonParser (HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
         self.i = 0
-
+        self.tagName = False
+        self.writePrefix = True
+        self.prefix = ''
+        
+    def handle_data(self, data):
+        if self.writePrefix == True:
+            if self.tagName == True:
+                self.prefix = 'f' + data.strip()[4].lower() # fontAwesome -> fa
+                self.tagName = False
+            if data.strip() == 'Font Name:':
+                self.tagName = True
     def handle_starttag(self, tag, attrs):
         for attr, v in attrs:
             if v and v.startswith('icon'):
                 if v[5:] != '':
-                    names.append(v[5:])
+                    if self.writePrefix == True:
+                        names.append((self.prefix + '_' + v[5:]).lower()) # fa_name
+                    else:
+                        names.append(v[5:])
             elif v and v.startswith('f'):
-                if self.i % 3 == 0 and v != 'fgc1':
+                if self.i % 3 == 0 and v!= 'fgc1':
                     glyphs.append('&#x' + v[0:4])
                 self.i = self.i + 1;                
 

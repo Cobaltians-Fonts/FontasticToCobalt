@@ -22,7 +22,8 @@ class bcolors:
 # defaults values
 packagename = 'org.cobaltians'
 version = '0.3'
-debug = True
+#debug = True
+debug = False
 
 # Which parser to use (use optional parameter --sources=fontastic|icomoon)
 fontastic = False
@@ -118,10 +119,6 @@ def main():
         names = parser.get_names()
         glyphs = parser.get_glyphs()
 
-        if debug == True :
-                print names
-                print glyphs
-        
         # End parsing
         file.close()
 
@@ -194,15 +191,12 @@ class ios_package_creator(object):
 
         def create(self):
                 logme(bcolors.BOLD + 'Starting to create IOS ' + self.fontname + ' package.' + bcolors.ENDC)
-                prefix = 'f' + self.fontname[0]
-                upperprefix = prefix.upper()    # ex: home -> @FAhome
-                lowerprefix = prefix.lower()    # ex: fontAwesome -> fa
 
                 # identifiers list generation: glass -> fa-glass
                 identifiers = []
 
                 for name in self.names:
-                        identifiers.append(lowerprefix + '-' +  name.replace("_", "-"))
+                        identifiers.append(name.replace("_", "-"))
 
                 # Token dictionary generation: fa-glass, &#xxxxx -> @"fa-glass" : @"\uxxxx",\n
                 tokenlist = ''
@@ -210,12 +204,12 @@ class ios_package_creator(object):
                 it = 1
 
                 for identifier, glyph in zip(identifiers, self.glyphs):
-                        tokenlist = tokenlist + '        @"' + identifier + '": ' + glyph + '"'
+                        tokenlist = tokenlist + '        @"' + identifier + '": @"' + glyph + '"'
                         if it != nbglyph:
                                 tokenlist = tokenlist + ',\n'
                         it = it + 1
 
-                tokenlist = tokenlist.replace('&#x', '@"\u') # converting to ios .m format
+                tokenlist = tokenlist.replace('&#x', '\u') # converting to ios .m format
                 tokenlist = tokenlist.strip()
 
                 # IOS package architecture
@@ -269,10 +263,6 @@ class android_package_creator(object):
                 mkdir_p(drawablepath)
                 mkdir_p(valuepath)
 
-                # Set font name prefix
-                prefix = 'f' + self.fontname[0]
-                prefix = prefix.lower()
-
                 # Create xml file
                 logme('Setting strings.xml file infos...')
                 doc = Document()
@@ -282,9 +272,9 @@ class android_package_creator(object):
                 for name, glyph in zip(self.names, self.glyphs):
                         entry = doc.createElement('string')
                         base.appendChild(entry)
-                        entry.setAttribute("name", prefix + '_' + name.replace("-", "_")) # ex: glass -> fa_glass
+                        entry.setAttribute("name", name.replace("-", "_")) # ex: glass -> fa_glass
                         entry.setAttribute("translatable"  , "false")
-                        entry_content = doc.createTextNode(glyph + ';') # ex: &#xf000 -> &#xf000;
+                        entry_content = doc.createTextNode(glyph)
                         entry.appendChild(entry_content)
                         
                 xmltxt = doc.toprettyxml(indent="    ", encoding="utf-8")
