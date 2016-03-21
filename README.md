@@ -24,12 +24,13 @@ Usage
 python fontToCobalt.py --source fontastic|icomoon --name fontname --arch android|ios icons-reference.html|Reference.html yourfont.ttf
 ```
 
-In Android Studio:
-* Open your projet
-* Select File/New/ImportModule/
-* Then select the generated font module 'Fonts-FontName-Android|IOS'
-* Clic Finish
-* Add this example code at the end of cobalt.conf
+*Note:* the `--name` param must match the font name as shown in your font book (Mac) or equivalent as in the screenshot below
+
+![Font book](https://cloud.githubusercontent.com/assets/2175246/13926054/eb4b7dbc-ef8a-11e5-9758-d86c2e6302ed.png)
+
+In cobalt.conf:
+
+Add this example code at the end of cobalt.conf
 ```
 "fonts" : {
  "fa": {
@@ -38,7 +39,20 @@ In Android Studio:
  }
 }
 ```
-* And Voila ! You can now use native bars icon using the name of the icon:
+In Android Studio:
+* Open your project
+* Select File/New/ImportModule/
+* Then select the generated font module 'Fonts-FontName-Android'
+* Clic Finish
+
+In Xcode:
+* Open your project or workspace
+* Drag and drop the generated 'Fonts-FontName-iOS' folder into your project navigator and check the "Copy items if needed" in the pop-up which appears
+![Import](https://cloud.githubusercontent.com/assets/2175246/13926345/24ba3646-ef8c-11e5-9eb1-4bed0b87e4eb.png)
+* Add a `Fonts provided by application` array in the .plist file of your application project with an item whose value is the filename of your font file.
+![plist](https://cloud.githubusercontent.com/assets/2175246/13926575/404fb1b4-ef8d-11e5-82d4-eb236ae838f4.png)
+
+Voila! You can now use native bars icon using the name of the icon:
 ```
 "icon": "fa house-icon"
 ```
