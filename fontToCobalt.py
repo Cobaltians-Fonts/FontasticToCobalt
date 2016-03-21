@@ -204,7 +204,7 @@ class ios_package_creator(object):
                 it = 1
 
                 for identifier, glyph in zip(identifiers, self.glyphs):
-                        tokenlist = tokenlist + '        @"' + identifier + '": @"' + glyph + '"'
+                        tokenlist = tokenlist + '        @"' + identifier + '": @"\u' + glyph + '"'
                         if it != nbglyph:
                                 tokenlist = tokenlist + ',\n'
                         it = it + 1

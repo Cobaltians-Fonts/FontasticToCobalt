@@ -65,7 +65,7 @@ tplfontm = Template("""
     UIColor *backgroundColor = [UIColor clearColor];
     CGRect textRect = CGRectMake(0, 0, size.width, size.height);
     
-    UIFont *font = [UIFont fontWithName:@"Font${fontkey}"
+    UIFont *font = [UIFont fontWithName:@"${fontkey}"
                                    size:size.height];
     
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
