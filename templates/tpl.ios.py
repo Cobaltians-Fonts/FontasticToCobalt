@@ -61,34 +61,36 @@ tplfontm = Template("""
     }
     
     NSString *icon = [Font${fontkey} stringForIcon:identifier];
-    NSRange iconRange = NSMakeRange(0, icon.length);
-    UIColor *backgroundColor = [UIColor clearColor];
-    CGRect textRect = CGRectMake(0, 0, size.width, size.height);
+    if (icon != nil) {
+        NSRange iconRange = NSMakeRange(0, icon.length);
+        UIColor *backgroundColor = [UIColor clearColor];
+        CGRect textRect = CGRectMake(0, 0, size.width, size.height);
     
-    UIFont *font = [UIFont fontWithName:@"${fontkey}"
-                                   size:size.height];
+        UIFont *font = [UIFont fontWithName:@"${fontkey}"
+                                       size:size.height];
     
-    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-    paragraphStyle.alignment = NSTextAlignmentCenter;
+        NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        paragraphStyle.alignment = NSTextAlignmentCenter;
     
-    NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:icon];
-    [text addAttribute:NSFontAttributeName
-                 value:font
-                 range:iconRange];
-    [text addAttribute:NSForegroundColorAttributeName
-                 value:color
-                 range:iconRange];
-    [text addAttribute:NSBackgroundColorAttributeName
-                 value:backgroundColor
-                 range:iconRange];
-    [text addAttribute:NSParagraphStyleAttributeName
-                 value:paragraphStyle
-                 range:iconRange];
-    [text drawInRect:textRect];
-    
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return image;
+        NSMutableAttributedString *text = [[NSMutableAttributedString alloc] initWithString:icon];
+        [text addAttribute:NSFontAttributeName
+                     value:font
+                     range:iconRange];
+        [text addAttribute:NSForegroundColorAttributeName
+                     value:color
+                     range:iconRange];
+        [text addAttribute:NSBackgroundColorAttributeName
+                     value:backgroundColor
+                     range:iconRange];
+        [text addAttribute:NSParagraphStyleAttributeName
+                     value:paragraphStyle
+                     range:iconRange];
+        [text drawInRect:textRect];
+
+        UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        return image;
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
