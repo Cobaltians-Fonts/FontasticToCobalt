@@ -2,7 +2,6 @@
 # Created by Roxane P. on 13/01/2016
 #
 
-from HTMLParser import HTMLParser
 from xml.dom.minidom import Document
 from string import Template
 import os, errno
@@ -21,14 +20,9 @@ class bcolors:
 
 # defaults values
 packagename = 'org.cobaltians'
-version = '0.3'
-#debug = True
-debug = False
-
-# Which parser to use (use optional parameter --sources=fontastic|icomoon)
-fontastic = False
-icomoon = False
-oldicomoon = False # fixme: used for famicity fonts refs
+version = '0.4'
+debug = True
+#debug = False
 
 try:
     androidtpl = imp.load_source('templates_android', 'templates/tpl.android.py')
@@ -38,9 +32,7 @@ except:
     raise
 
 try:
-    fontastic_parser = imp.load_source('parsers_fontastic', 'parsers/fontastic.py')
-    icomoon_parser = imp.load_source('parsers_icomoon', 'parsers/icomoon.py')
-    oldicomoon_parser = imp.load_source('parsers_oldicomoon', 'parsers/oldicomoon.py')
+    css_parser = imp.load_source('parsers_css', 'parsers/css.py')
 except:
     print bcolors.FAIL + "I'm missing my parsers. Exiting..." + bcolors.ENDC
     raise
@@ -50,34 +42,33 @@ def main():
         names = []
         glyphs = []
 
+        # True if user override default font name
+        customFontName = False
+        
+        # prefix of the font (fontAwesome -> fa)
+        prefix = 'icon' # default value
+        
         # optional parameter
-        fontname = 'awesome'
+        fontname = 'cobaltians'
         fontname = fontname.title()
         
         # Use optional parameter to create only the wanted package (--arch ios|android)
         android = True
         ios = True
 
-        # Use source parameter to specify the HTML web-site source (--source fontastic|icomoon)
-        source = None
-
         # Needed parameters
-        html_file_name = None
+        css_file_name = None
         ttf_file_name = None
 
         # Parse arguments
         try:
-                options, remainder = getopt.getopt(sys.argv[1:], 's:a:n:hv', ['source=', 'arch=', 'name=', 'help'])
+                options, remainder = getopt.getopt(sys.argv[1:], 'a:n:hv', ['arch=', 'name=', 'help'])
         except getopt.GetoptError as err:
                 print str(err) # print help information and exit
                 sys.exit(2)
 
         for opt, arg in options:
-                if opt in ('-s', '--source'):
-                        if arg == 'fontastic' or arg == 'icomoon' or arg == 'oldicomoon':
-                                source = arg
-                        else: print bcolors.FAIL + "I don't have any parser for " + arg + " yet. Try 'fontastic' or 'icomoon'" + bcolors.ENDC
-                elif opt in ('-a', '--arch'):
+                if opt in ('-a', '--arch'):
                         if arg == 'android': ios = False
                         elif arg == 'ios': android = False
                         else:
@@ -89,45 +80,44 @@ def main():
                 elif opt in ('-n', '--name'):
                         logme('Set ' + arg + ' as font name.')
                         fontname = arg.title()
+                        customFontName = True
                 elif opt in ('-v'):
                         print 'Version', version
                         exit(0)
         try:
-                html_file_name = remainder[0]
+                css_file_name = remainder[0]
                 ttf_file_name = remainder[1]
         except IndexError as exc:
                 print bcolors.FAIL + 'Bad arguments, see help:' + bcolors.ENDC
                 usage()
                 exit(1)
-        
-        # Opening HTML file
-        logme('Opening ' + html_file_name + ' and parsing HTML...')
+
+        # Init css parser
+        parser = css_parser
+
+        # Opening CSS file
+        logme('Opening ' + css_file_name + ' and parsing CSS...')
         try:
-                file = open(html_file_name, 'r')
+                parser.parseCSS(css_file_name)
         except IOError as exc:
-                logme(bcolors.FAIL + 'Error: File ' + html_file_name + ' not found' + bcolors.ENDC)
+                logme(bcolors.FAIL + 'Error: File ' + css_file_name + ' not found' + bcolors.ENDC)
                 exit(4)
 
-        # IcoMoon or fontastic (there are more to come)
-        if source == 'icomoon': parser = icomoon_parser
-        elif source == 'oldicomoon': parser = oldicomoon_parser
-        elif source == 'fontastic': parser = fontastic_parser
-        else : parser = icomoon_parser
-        
-        # Starting to parse HTML
-        parser.parseHTML(file)
+        # Get Result from CSS parsing
         names = parser.get_names()
         glyphs = parser.get_glyphs()
+        if (customFontName == False):
+                fontname = parser.get_fontName()
+        prefix = parser.get_prefix()
 
-        # End parsing
-        file.close()
+        #print shortName(ttf_file_name)
 
         # Create packages
         if android == True:
-                android_package_creator(fontname, names, glyphs, ttf_file_name).create()
+                android_package_creator(fontname, prefix, names, glyphs, ttf_file_name).create()
                 print bcolors.OKGREEN + ' * Android ' + fontname + ' font package added.' + bcolors.ENDC
         if ios == True:
-                ios_package_creator(fontname, names, glyphs, ttf_file_name).create()
+                ios_package_creator(fontname, prefix, names, glyphs, ttf_file_name).create()
                 print bcolors.OKGREEN + ' * IOS ' + fontname + ' font package added.' + bcolors.ENDC
 
 #
@@ -136,7 +126,7 @@ def main():
 
 # print help
 def usage():
-        print bcolors.BOLD + 'Usage: python fontToCobalt -s fontastic|icomoon [-a android|ios] [-n fontname] icons-references.html Fontxxx.ttf' + bcolors.ENDC        
+        print bcolors.BOLD + 'Usage: python fontToCobalt [-a android|ios] [-n fontname] styles.css Fontxxx.ttf' + bcolors.ENDC        
 
 # Usage :
 # str   : what to log
@@ -174,25 +164,25 @@ def generatefile(name, path, content):
 def copyfile(src, dst):
     logme(bcolors.OKBLUE + 'Copying ' + src + ' to ' + dst + '...' + bcolors.ENDC)
     shutil.copy(src, dst)
-
-#
+    
 # Generate an Ios librairy containing the font
 # fontname : name of the package
+# prefix: prefix of the font name
 # names : icons names
 # glyphs : icons glyphs
 # ttf : true type file path
-#
 class ios_package_creator(object):
-        def __init__(self, fontname, names, glyphs, ttf):
+        def __init__(self, fontname, prefix, names, glyphs, ttf):
                 self.fontname = fontname
+                self.prefix = prefix
                 self.names = names
                 self.glyphs = glyphs
                 self.ttf = ttf
 
         def create(self):
                 logme(bcolors.BOLD + 'Starting to create IOS ' + self.fontname + ' package.' + bcolors.ENDC)
-
-                # identifiers list generation: glass -> fa-glass
+                print self.fontname
+                # Identifiers contains names of font charaters: fa_glass -> fa-glass
                 identifiers = []
 
                 for name in self.names:
@@ -202,9 +192,10 @@ class ios_package_creator(object):
                 tokenlist = ''
                 nbglyph = len(self.glyphs)
                 it = 1
-
                 for identifier, glyph in zip(identifiers, self.glyphs):
-                        tokenlist = tokenlist + '        @"' + identifier + '": @"\u' + glyph + '"'
+                        if glyph[0] == '\\':
+                                glyph = '\\u' + glyph[1:] # Add 'u' after antislash \e500 -> \ue500
+                        tokenlist = tokenlist + '        @"' + identifier + '": @"' + glyph + '"'
                         if it != nbglyph:
                                 tokenlist = tokenlist + ',\n'
                         it = it + 1
@@ -233,16 +224,16 @@ class ios_package_creator(object):
                 path = iospackagepath + 'Font' + self.fontname + '.ttf'
                 copyfile(self.ttf, path)
 
-#
 # Generate an android module containing the font
 # fontname : name of the package
+# prefix : prefix of the font name
 # names : icons names
 # glyphs : icons glyphs
 # ttf : true type file path
-#
 class android_package_creator(object):
-        def __init__(self, fontname, names, glyphs, ttf):
+        def __init__(self, fontname, prefix, names, glyphs, ttf):
                 self.fontname = fontname
+                self.prefix = prefix
                 self.names = names
                 self.glyphs = glyphs
                 self.ttf = ttf
@@ -274,7 +265,7 @@ class android_package_creator(object):
                         base.appendChild(entry)
                         entry.setAttribute("name", name.replace("-", "_")) # ex: glass -> fa_glass
                         entry.setAttribute("translatable"  , "false")
-                        entry_content = doc.createTextNode(glyph)
+                        entry_content = doc.createTextNode(glyph.replace('\\', '&#x'))
                         entry.appendChild(entry_content)
                         
                 xmltxt = doc.toprettyxml(indent="    ", encoding="utf-8")

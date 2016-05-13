@@ -55,3 +55,8 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# fonts files for testing
+fonts/
+Fonts-FontAwesome-Android/
+Fonts-FontAwesome-iOS/
