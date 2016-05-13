@@ -22,7 +22,7 @@ Usage
 -----
 
 ```
-python fontToCobalt.py --name fontname --arch android|ios icons-reference.html|Reference.html yourfont.ttf
+python fontToCobalt.py --name fontname --arch android|ios styles.css yourfont.ttf
 ```
 
 Examples
