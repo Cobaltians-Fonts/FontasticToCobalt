@@ -239,8 +239,8 @@ class android_package_creator(object):
                 self.ttf = ttf
 
         def create(self):
-                prefixValue = '' # you can put here all your special entity ex:'&#x' '&amp'
-                suffixValue = '' # ex: ';'
+                prefixValue = '&#x' # you can put here all your special entity ex:'&#x' '&amp'
+                suffixValue = ';' # ex: ';'
 
                 logme(bcolors.BOLD + 'Starting to create Android ' + self.fontname + ' package.' + bcolors.ENDC)
                 # Android package architecture
@@ -268,11 +268,11 @@ class android_package_creator(object):
                         base.appendChild(entry)
                         entry.setAttribute("name", name.replace("-", "_")) # ex: glass -> fa_glass
                         entry.setAttribute("translatable"  , "false")
-                        entry_content = doc.createTextNode(suffixValue + glyph.replace('\\', prefixValue))
+                        entry_content = doc.createTextNode(glyph.replace('\\', prefixValue) + suffixValue)
                         entry.appendChild(entry_content)
 
                 xmltxt = doc.toprettyxml(indent="    ", encoding="utf-8")
-                xmltxt = xmltxt.replace('&amp;', '') # utf-8 fix
+                xmltxt = xmltxt.replace('&amp;', '&') # utf-8 fix
                 generatefile('strings.xml', valuepath, xmltxt)
 
                 # Create values.xml
