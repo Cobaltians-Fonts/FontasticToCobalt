@@ -51,23 +51,13 @@ tplfontm = Template("""
 
 + (UIImage *)imageWithIcon:(NSString *)identifier
                      color:(UIColor *)color
-                   andSize:(CGSize)size {
-    CGFloat scale = [UIScreen mainScreen].scale;
-    if ([UIScreen instancesRespondToSelector:@selector(scale)]) {
-        UIGraphicsBeginImageContextWithOptions(size, NO, scale);
-    }
-    else {
-        UIGraphicsBeginImageContext(size);
-    }
-    
+                   andSize:(CGFloat)size {
     NSString *icon = [Font${fontkey} stringForIcon:identifier];
     if (icon != nil) {
         NSRange iconRange = NSMakeRange(0, icon.length);
-        UIColor *backgroundColor = [UIColor clearColor];
-        CGRect textRect = CGRectMake(0, 0, size.width, size.height);
-    
         UIFont *font = [UIFont fontWithName:@"${fontkey}"
-                                       size:size.height];
+                                       size:size];                    
+        UIColor *backgroundColor = [UIColor clearColor];
     
         NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
         paragraphStyle.alignment = NSTextAlignmentCenter;
@@ -85,10 +75,21 @@ tplfontm = Template("""
         [text addAttribute:NSParagraphStyleAttributeName
                      value:paragraphStyle
                      range:iconRange];
+                     
+        CGSize textSize = text.size;
+        CGRect textRect = CGRectMake(0, 0, textSize.width, textSize.height);
+        CGFloat scale = [UIScreen mainScreen].scale;
+        if ([UIScreen instancesRespondToSelector:@selector(scale)]) {
+            UIGraphicsBeginImageContextWithOptions(textSize, NO, scale);
+        }
+        else {
+            UIGraphicsBeginImageContext(textSize);
+        }
         [text drawInRect:textRect];
 
         UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
+        
         return image;
     }
     
