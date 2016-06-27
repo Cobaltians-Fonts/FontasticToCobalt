@@ -22,7 +22,7 @@ Usage
 -----
 
 ```
-python fontToCobalt.py --name fontname --arch android|ios styles.css yourfont.ttf
+python fontToCobalt.py --arch android|ios youtFontName styles.css yourfont.ttf
 ```
 
 Examples
@@ -30,14 +30,14 @@ Examples
 
 ```
 python fontToCobalt.py styles.css yourfont.ttf
-python fontToCobalt.py --name myFontName styles.css yourfont.ttf
-python fontToCobalt.py --name myFontName --arch ios styles.css yourfont.ttf
+python fontToCobalt.py myFontName styles.css yourfont.ttf
+python fontToCobalt.py --arch ios myFontName styles.css yourfont.ttf
 ```
 
 Installation
 ------------
 
-*Note:* the `--name` param must match the font name as shown in your font book (Mac) or equivalent as in the screenshot below
+*Note:* the specified font name param must match the font name as shown in your font book (Mac) or equivalent as in the screenshot below
 
 ![Font book](https://cloud.githubusercontent.com/assets/2175246/13926054/eb4b7dbc-ef8a-11e5-9758-d86c2e6302ed.png)
 

@@ -41,16 +41,12 @@ except:
 def main():
         names = []
         glyphs = []
-
-        # True if user override default font name
-        customFontName = False
         
         # prefix of the font (fontAwesome -> fa)
         prefix = 'icon' # default value
         
         # optional parameter
-        fontname = 'cobaltians'
-        fontname = fontname.title()
+        fontname = '' # font name must be specified
         
         # Use optional parameter to create only the wanted package (--arch ios|android)
         android = True
@@ -62,7 +58,7 @@ def main():
 
         # Parse arguments
         try:
-                options, remainder = getopt.getopt(sys.argv[1:], 'a:n:hv', ['arch=', 'name=', 'help'])
+                options, remainder = getopt.getopt(sys.argv[1:], 'a:hv', ['arch=', 'help'])
         except getopt.GetoptError as err:
                 print str(err) # print help information and exit
                 sys.exit(2)
@@ -77,21 +73,18 @@ def main():
                 elif opt in ('-h', '--help'):
                         usage()
                         sys.exit(0)
-                elif opt in ('-n', '--name'):
-                        logme('Set ' + arg + ' as font name.')
-                        fontname = arg.title()
-                        customFontName = True
                 elif opt in ('-v'):
                         print 'Version', version
                         exit(0)
         try:
-                css_file_name = remainder[0]
-                ttf_file_name = remainder[1]
+                fontname = remainder[0].title()
+                css_file_name = remainder[1]
+                ttf_file_name = remainder[2]
         except IndexError as exc:
                 print bcolors.FAIL + 'Bad arguments, see help:' + bcolors.ENDC
                 usage()
                 exit(1)
-
+    
         # Init css parser
         parser = css_parser
 
@@ -106,19 +99,15 @@ def main():
         # Get Result from CSS parsing
         names = parser.get_names()
         glyphs = parser.get_glyphs()
-        if (customFontName == False):
-                fontname = parser.get_fontName()
         prefix = parser.get_prefix()
-
-        #print shortName(ttf_file_name)
 
         # Create packages
         if android == True:
                 android_package_creator(fontname, prefix, names, glyphs, ttf_file_name).create()
-                print bcolors.OKGREEN + ' * Android ' + fontname + ' font package added.' + bcolors.ENDC
+                print bcolors.OKGREEN + ' * Android ' + fontname + 'font package added.' + bcolors.ENDC
         if ios == True:
                 ios_package_creator(fontname, prefix, names, glyphs, ttf_file_name).create()
-                print bcolors.OKGREEN + ' * IOS ' + fontname + ' font package added.' + bcolors.ENDC
+                print bcolors.OKGREEN + ' * iOS ' + fontname + 'font package added.' + bcolors.ENDC
 
 #
 # Functions and class definitions
@@ -126,7 +115,7 @@ def main():
 
 # print help
 def usage():
-        print bcolors.BOLD + 'Usage: python fontToCobalt [-a android|ios] [-n fontname] styles.css Fontxxx.ttf' + bcolors.ENDC        
+        print bcolors.BOLD + 'Usage: python fontToCobalt [-a android|ios] yourFontName styles.css Fontxxx.ttf' + bcolors.ENDC
 
 # Usage :
 # str   : what to log
@@ -180,7 +169,7 @@ class ios_package_creator(object):
                 self.ttf = ttf
 
         def create(self):
-                logme(bcolors.BOLD + 'Starting to create IOS ' + self.fontname + ' package.' + bcolors.ENDC)
+                logme(bcolors.BOLD + 'Starting to create IOS' + self.fontname + ' package.' + bcolors.ENDC)
                 print self.fontname
                 # Identifiers contains names of font charaters: fa_glass -> fa-glass
                 identifiers = []
@@ -242,7 +231,7 @@ class android_package_creator(object):
                 prefixValue = '&#x' # you can put here all your special entity ex:'&#x' '&amp'
                 suffixValue = ';' # ex: ';'
 
-                logme(bcolors.BOLD + 'Starting to create Android ' + self.fontname + ' package.' + bcolors.ENDC)
+                logme(bcolors.BOLD + 'Starting to create Android' + self.fontname + ' package.' + bcolors.ENDC)
                 # Android package architecture
                 packagepath = packagename.replace(".", "/") + '/'
                 fontpath = 'Fonts-Font' + self.fontname + '-Android/'
