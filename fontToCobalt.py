@@ -170,7 +170,6 @@ class ios_package_creator(object):
 
         def create(self):
                 logme(bcolors.BOLD + 'Starting to create IOS' + self.fontname + ' package.' + bcolors.ENDC)
-                print self.fontname
                 # Identifiers contains names of font charaters: fa_glass -> fa-glass
                 identifiers = []
 

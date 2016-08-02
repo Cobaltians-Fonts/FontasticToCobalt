@@ -21,20 +21,31 @@ def parseCSS(file):
         if hasattr(rule, "declarations"):
             glyph = rule.declarations
             if glyph[0].name == 'content':
+                # get glyph
                 cssglyph = glyph[0].value.as_css().replace('"', '').lower()
-                cssname = rule.selector.as_css().split(':', 1)[0].replace('.', '').lower()
-                if debug == True:
-                    print '\nfont prefix:', rule.selector.as_css().split('-', 1)[0].replace('.', '')
-                    print 'icon selector:', cssname
-                    print 'icon value:', cssglyph
-                    print 'rule attribute:', glyph[0].name
-                    print 'rule priority:', glyph[0].priority
-                    print 'rule column:', glyph[0].column
-                    print 'rule line:', glyph[0].line
-                names.append(cssname) # set a name in names
-                glyphs.append(cssglyph) # set a glyph in glyphs
+                # get all selectors
+                input = rule.selector.as_css().split('.')
+                nbTotalSelector = len(input) - 1
+                nbCurrentSelector = nbTotalSelector
+                while nbCurrentSelector:
+                    cssname = input[nbCurrentSelector].split(':', 1)[0].replace('.', '').lower()
+                    if debug == True:
+                        print '\nfont prefix:', rule.selector.as_css().split('-', 1)[0].replace('.', '')
+                        print 'icon selector [', nbTotalSelector - (nbCurrentSelector - 1), '/', nbTotalSelector, '] :', cssname
+                        print 'icon value:', cssglyph
+                        print 'rule attribute:', glyph[0].name
+                        print 'rule priority:', glyph[0].priority
+                        print 'rule column:', glyph[0].column
+                        print 'rule line:', glyph[0].line
+                    names.append(cssname) # set a name in names
+                    glyphs.append(cssglyph) # set a glyph in glyphs
+                    nbCurrentSelector -= 1
                 if prefix == '': # set the font prefix only once
                     prefix = rule.selector.as_css().split('-', 1)[0].replace('.', '')
+
+
+
+                    
 def get_names():
     if len(names) == 0:
         print '\033[93mWarning: parser returning empty selectors.\033[0m'
